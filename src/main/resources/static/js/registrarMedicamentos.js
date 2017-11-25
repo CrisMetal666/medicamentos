@@ -103,8 +103,6 @@ function validar() {
 		fecha: date,
 		ingreso: ingresoCantidad
 	}
-	
-	alert(date);
 
 	$.ajax({
 		type: "POST",
