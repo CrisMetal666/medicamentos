@@ -23,23 +23,70 @@ public interface IMedicamentosRepository extends JpaRepository<Medicamentos, Int
 	
 	/**
 	 * Se consultan los medicamentos pertenecientes a un establecimiento que no han sido registrados en el mes especificado
-	 * @param mes. Mes actual (1-12)
+	 * @param mes (yyyy/mm/dd)
 	 * @param id del establecimiento
 	 * @return
 	 */
-	@Query(value = "select m.* from medicamentos as m inner join establecimiento_medicamento as em " + 
-			"on  m.id = em.idmedicamento WHERE em.id not IN (SELECT historial.idestablecimiento_medicamento " + 
-			"FROM medicamentos.historial WHERE MONTH(fecha) = ?) and em.idestablecimiento = ?", nativeQuery = true)
-	List<Medicamentos> listarMedicamentosNoRegistrados(int mes, int id);
+	@Query(value = "select new com.medicamentos.model.Medicamentos(m.id, m.nombreGenerico) from Medicamentos "
+			+ "m inner join m.establecimientoMedicamentos em where em.id not in (select h.establecimientoMedicamento.id " 
+			+ "from Historial h where month(h.fecha) = month(:fecha) and year(h.fecha) = year(:fecha)) and "
+			+ "em.establecimiento.id = :id")
+	List<Medicamentos> listarMedicamentosNoRegistrados(@Param("fecha")String mes, @Param("id")int id);
 	
 	/**
 	 * Se consultan los medicamentos pertenecientes a un establecimiento que han sido registrados en el mes espeficicado
-	 * @param mes. Mes actual (1-12)
+	 * @param mes (yyyy/mm/dd)
 	 * @param id del establecimiento
 	 * @return
 	 */
-	@Query(value = "select m.* from medicamentos as m inner join establecimiento_medicamento as em " + 
-			"on  m.id = em.idmedicamento WHERE em.id IN (SELECT historial.idestablecimiento_medicamento " + 
-			"FROM medicamentos.historial WHERE MONTH(fecha) = ?) and em.idestablecimiento = ?", nativeQuery = true)
-	List<Medicamentos> listarMedicamentosRegistrados(int mes, int id);
+	@Query(value = "select new com.medicamentos.model.Medicamentos(m.id, m.nombreGenerico) from Medicamentos "
+			+ "m inner join m.establecimientoMedicamentos em where em.id in (select h.establecimientoMedicamento.id " 
+			+ "from Historial h where month(h.fecha) = month(:fecha) and year(h.fecha) = year(:fecha)) and "
+			+ "em.establecimiento.id = :id")
+	List<Medicamentos> listarMedicamentosRegistrados(@Param("fecha")String mes, @Param("id")int id);
+	
+	/**
+	 * Se consultaran los medicamentos que se encuentran registrados en el mes especificado con su respectivo saldo
+	 * @param mes (yyyy/mm/dd)
+	 * @param id del establecimiento
+	 * @return lista de medicamentos con saldo
+	 */
+	@Query("select new com.medicamentos.model.Medicamentos(m.id, m.nombreGenerico, h.saldo) from Medicamentos m inner join "
+			+ "m.establecimientoMedicamentos em inner join em.historials h "  
+			+ "where em.establecimiento.id = :id and month(h.fecha) = month(:fecha) and year(h.fecha) = year(:fecha)")
+	List<Medicamentos> listarMedicamentosConSaldo(@Param("fecha")String mes, @Param("id")int id);
+	
+	/**
+	 * Se consultaran los medicamentos que se encuentran registrados en el mes actual con su respectivo saldo
+	 * @param mes (yyyy/mm/dd)
+	 * @param id del establecimiento
+	 * @return lista de medicamentos con saldo
+	 */
+	@Query("select new com.medicamentos.model.Medicamentos(m.id, m.nombreGenerico, h.saldo) from Medicamentos m inner join "
+			+ "m.establecimientoMedicamentos em inner join em.historials h "  
+			+ "where em.establecimiento.id = :id and month(h.fecha) = month(now()) and year(h.fecha) = year(now())")
+	List<Medicamentos> listarMedicamentosConSaldo(@Param("id")int id);
+	
+	/**
+	 * se consultan los todos los medicamentos que han registrado su historial en le mes actual
+	 * @return
+	 */
+	@Query("select new com.medicamentos.model.Medicamentos(m.id, m.nombreGenerico) from Medicamentos m inner join "
+			+ "m.establecimientoMedicamentos em inner join em.historials h "  
+			+ "where month(h.fecha) = month(now()) and year(h.fecha) = year(now())")
+	List<Medicamentos> listarMedicamentos();
+	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

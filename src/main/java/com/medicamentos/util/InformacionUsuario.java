@@ -15,6 +15,10 @@ public class InformacionUsuario {
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		
+		if(auth == null) {
+			return "";
+		}
+		
 		if (!(auth instanceof AnonymousAuthenticationToken)) {
 			
 			UserDetails userDetail = (UserDetails) auth.getPrincipal();

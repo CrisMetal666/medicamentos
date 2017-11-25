@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.medicamentos.model.Medicamentos;
 import com.medicamentos.repository.IMedicamentosRepository;
 import com.medicamentos.service.IEstablecimientoService;
+import com.medicamentos.service.IHistorialService;
 import com.medicamentos.service.IMedicamentosService;
 import com.medicamentos.util.InformacionUsuario;
 
@@ -16,8 +17,13 @@ public class MedicametosServiceImpl implements IMedicamentosService {
 
 	@Autowired
 	private IMedicamentosRepository medicamentosRepo;
+	
 	@Autowired
 	private IEstablecimientoService establecimientoService;
+	
+	@Autowired
+	private IHistorialService historialService;
+	
 	@Autowired
 	private InformacionUsuario infUser;
 
@@ -52,31 +58,50 @@ public class MedicametosServiceImpl implements IMedicamentosService {
 	}
 
 	@Override
-	public List<Medicamentos> listarMedicamentosNoRegistrados(int mes) throws Exception {
+	public List<Medicamentos> listarMedicamentosNoRegistrados(String fecha) throws Exception {
 
 		int id = establecimientoService.getIdPorUsuarioIdentificacion(infUser.getUsuario());
 
-		List<Medicamentos> lista = medicamentosRepo.listarMedicamentosNoRegistrados(mes, id);
-
-		for (Medicamentos m : lista) {
-			m.setEstablecimientoMedicamentos(null);
-		}
+		List<Medicamentos> lista = medicamentosRepo.listarMedicamentosNoRegistrados(fecha, id);
 
 		return lista;
 	}
 
 	@Override
-	public List<Medicamentos> listarMedicamentosRegistrados(int mes) throws Exception {
+	public List<Medicamentos> listarMedicamentosRegistrados(String fecha) throws Exception {
 
 		int id = establecimientoService.getIdPorUsuarioIdentificacion(infUser.getUsuario());
 
-		List<Medicamentos> lista = medicamentosRepo.listarMedicamentosRegistrados(mes, id);
-
-		for (Medicamentos m : lista) {
-			m.setEstablecimientoMedicamentos(null);
-		}
+		List<Medicamentos> lista = medicamentosRepo.listarMedicamentosRegistrados(fecha, id);
 
 		return lista;
+	}
+
+	@Override
+	public List<Medicamentos> listarMedicamentosConSaldo(String mes) {
+		
+		int id = establecimientoService.getIdPorUsuarioIdentificacion(infUser.getUsuario());
+		
+		return medicamentosRepo.listarMedicamentosConSaldo(mes, id);
+	}
+
+	@Override
+	public List<Medicamentos> listarMedicamentosConSaldo(int id) {
+		
+		return medicamentosRepo.listarMedicamentosConSaldo(id);
+	}
+
+	@Override
+	public List<Medicamentos> listarMedicamentosConSumSaldo() {
+		
+		List<Medicamentos> lst = medicamentosRepo.listarMedicamentos();
+		
+		for(Medicamentos medicamento : lst) {
+			
+			medicamento.setSaldo(historialService.getSumSaldo(medicamento.getId()));
+		}
+		
+		return lst;
 	}
 
 }

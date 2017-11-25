@@ -20,10 +20,21 @@ public class NavegacionController {
 		return "login";
 	}
 	
+	@RequestMapping(value = "/notFound", method = RequestMethod.GET)
+	public String notFound() {
+		return "redirect:/login";
+	}
+	
 	@RequestMapping(value = "/user/actualizar", method = RequestMethod.GET)
 	public String actualizar() {
 		
 		return "users/actualizarMedicamentos";
+	}
+	
+	@RequestMapping(value = "/admin/medicamentos", method = RequestMethod.GET)
+	public String medicamentosAdmin() {
+		
+		return "admins/medicamentoAdmin";
 	}
 
 	@RequestMapping(value = "/inicio", method = RequestMethod.GET)
@@ -39,7 +50,10 @@ public class NavegacionController {
 			
 		} else if (rol.equals("ROLE_ADMIN")) {
 			
-			direccion = "admins/inicio";
+			direccion = "admins/establecimientoAdmin";
+			
+		} else if(rol.isEmpty()) {
+			direccion = "login";
 		}
 
 		return direccion;
@@ -60,3 +74,4 @@ public class NavegacionController {
 
 	}
 }
+	

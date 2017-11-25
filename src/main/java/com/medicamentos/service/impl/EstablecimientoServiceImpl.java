@@ -36,6 +36,16 @@ public class EstablecimientoServiceImpl implements IEstablecimientoService {
 	@Override
 	public List<Establecimiento> listarTodos() throws Exception {
 		
+		List<Establecimiento> lst = establecimientoRepo.findAll();
+		
+		if(lst != null && !lst.isEmpty()) {
+			
+			lst.forEach(x -> {
+				x.setEstablecimientoMedicamentos(null);
+				x.setUsuario(null);
+			});
+		}
+		
 		return establecimientoRepo.findAll();
 	}
 

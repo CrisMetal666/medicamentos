@@ -1,6 +1,6 @@
 package com.medicamentos.service.impl;
 
-import java.util.Calendar;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +12,7 @@ import com.medicamentos.repository.IHistorialRepository;
 import com.medicamentos.service.IEstablecimientoMedicamentoService;
 import com.medicamentos.service.IEstablecimientoService;
 import com.medicamentos.service.IHistorialService;
+import com.medicamentos.util.DateFormat;
 import com.medicamentos.util.InformacionUsuario;
 
 @Service
@@ -25,6 +26,8 @@ public class HistorailServiceImpl implements IHistorialService {
 	private InformacionUsuario infUser;
 	@Autowired
 	private IEstablecimientoMedicamentoService establecimientoMedicamentoService;
+	@Autowired
+	private DateFormat dateFormat;
 
 	@Override
 	public void guardar(Historial entidad) throws Exception {
@@ -37,12 +40,11 @@ public class HistorailServiceImpl implements IHistorialService {
 		int idEstablecimientoMedicamento = establecimientoMedicamentoService
 				.getIdPorEstablecimientoMedicamento(idMedicamento, idEstablecimiento);
 
-		// obtenemos el mes actual que necesitaremos para la consulta
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(entidad.getFecha());
-		int month = cal.get(Calendar.MONTH);
+		// formatiamos la fecha a String
+		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+		String date = format.format(entidad.getFecha());		
 
-		Integer saldoAnterior = historialRepo.getSaldoAnterior(idMedicamento, idEstablecimiento, month);
+		Integer saldoAnterior = this.getSaldoAnterior(idMedicamento, idEstablecimiento, date);
 
 		if (saldoAnterior == null)
 			saldoAnterior = 0;
@@ -75,14 +77,30 @@ public class HistorailServiceImpl implements IHistorialService {
 	}
 
 	@Override
-	public Historial getHistorialPorIdMedicamentoIdEstablecimientoMes(int idMedi, int mes) throws Exception {
+	public Historial getHistorialPorIdMedicamentoIdEstablecimientoMes(int idMedi, String fecha) throws Exception {
 
 		// Obtenemos el usuario que esta logeado
 		String username = infUser.getUsuario();
 
 		int idEstablecimiento = establecimientoService.getIdPorUsuarioIdentificacion(username);
 
-		return historialRepo.getHistorialPorIdMedicamentoIdEstablecimientoMes(idMedi, idEstablecimiento, mes);
+		return historialRepo.getHistorialPorIdMedicamentoIdEstablecimientoMes(idMedi, idEstablecimiento, fecha);
 	}
+
+	@Override
+	public Integer getSaldoAnterior(int idMedicamento, int idEstablecimiento, String fecha) throws Exception {
+		
+		String fechaAnterior = dateFormat.getMesAnteriorString(fecha);
+		
+		return historialRepo.getSaldoAnterior(idMedicamento, idEstablecimiento, fechaAnterior);
+	}
+
+	@Override
+	public Integer getSumSaldo(int idMedicamento) {
+		
+		return historialRepo.getSumSaldo(idMedicamento);
+	}
+	
+	
 
 }
