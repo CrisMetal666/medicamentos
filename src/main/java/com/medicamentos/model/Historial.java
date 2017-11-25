@@ -119,7 +119,7 @@ public class Historial implements java.io.Serializable {
 
 	@Column(name = "fecha", nullable = false, length = 45)
 	@Temporal(TemporalType.DATE)
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy", timezone="America/Bogota")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd", timezone="America/Bogota")
 	public Date getFecha() {
 		return this.fecha;
 	}

@@ -42,6 +42,8 @@ public class HistorailServiceImpl implements IHistorialService {
 
 		// formatiamos la fecha a String
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+		
+		System.out.println(format);
 		String date = format.format(entidad.getFecha());		
 
 		Integer saldoAnterior = this.getSaldoAnterior(idMedicamento, idEstablecimiento, date);

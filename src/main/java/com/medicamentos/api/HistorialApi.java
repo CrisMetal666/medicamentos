@@ -31,6 +31,8 @@ public class HistorialApi {
 		try {
 
 			historialService.guardar(pHistorial);
+			
+			System.out.println(pHistorial.getFecha());
 
 			map.put("status", "OK");
 
